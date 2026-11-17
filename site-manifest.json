@@ -120,7 +120,7 @@
     "temperature.html": "69b8643e72afbdee55a3df00ee3faa4e138aa8fdc4e459b66292d2504812fa7f",
     "thetis.html": "f97d7aeb2b742cee7cafb4a070cc82ababada5d61330ff20b7b0d3f11a586ca5",
     "tones.html": "0749ae41273f7b19a09e9273e3e7a6e412f7c4c4eef8a76dc708d4cc981f1e9b",
-    "unattended-station.html": "60a56944fc69019cc74a85dd386d33a82d5e5106d413771bc9aa864282fcf15c"
+    "unattended-station.html": "027721212e75d557ff0decd614b5e3ec1d3db35ce2bece3d9eb8d3b957847892"
   },
   "files": {
     ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -236,7 +236,7 @@
     "rotators.html": "7b6b4f98ec6f3c28823194b63da3ae46d826716f2ca5eae5b84937bd54d6bae1",
     "scope-units.html": "f8ffa0ace6a96322f5202f738ad1b1f760f63800d15cf36d23e05e51e4a8bd4e",
     "scope.html": "3fecf30d6e835ee3c3d430e9a2dbd75abed4a6046b6e3e74db04cb9021c8ba95",
-    "search-data.js": "e6b87a6b56d4ca79ad881867a3157dc2115033614bcb0eca410fa93d9d8ddf14",
+    "search-data.js": "45cab4f958b8b05448b08790e0a569c46ffbcfcb3679b7eb0b93cc40ad815313",
     "site.css": "5f1ecc50f9699e7eeaf768187f93af9737558a02355b07baac4a8962298be080",
     "site.js": "fa3a5d2fad47b434652bee4cf85a8f5bab235628d0d4974199275ff2e2489d50",
     "smart-reset.html": "27a7b1af83f56a67ae543855c1244bd7c5ec78e8a7b81cf4c7a0c7e7a1469b86",
@@ -247,6 +247,6 @@
     "temperature.html": "9a10247f496c8e4a21e54b40a3418b53fe44e96ada8f57889d817cb50d92f820",
     "thetis.html": "c0bd90b840ff5025070c3f9f07063f30d4683f3599d5e2fb13192e6b9b25cd10",
     "tones.html": "328a86b186bdd8efef87f39910ab4dcbbb47a6826e31183b6d0f08b15600a30c",
-    "unattended-station.html": "575639361d9bbc9f7fff7a21f98d5ca96212a6fc648789619b74a656a9428b7d"
+    "unattended-station.html": "0100de3ba2716b9618223b2f1a328c8419051ff4240155d15e2edce66eb4ffbe"
   }
 }

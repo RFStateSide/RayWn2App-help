@@ -1,0 +1,219 @@
+[
+  {
+    "id": "ray-api-v1-example",
+    "type": "tab",
+    "label": "RayWn2App HTTPS API v1 example",
+    "disabled": false,
+    "info": "Standalone read-only HTTP consumer. No MQTT and no dashboard add-on. Supply URL/token/device/channel through the Node-RED process environment. Configure and verify TLS trust. Start polling by setting the Poll inject repeat to 1 second. The watchdog clears old readings even if requests stall. Never wire the Prepare node directly to Debug."
+  },
+  {
+    "id": "ray-api-note",
+    "type": "comment",
+    "z": "ray-api-v1-example",
+    "name": "Configure environment + TLS, then enable 1-second polling",
+    "info": "RAYWN2_API_URL=https://station.example:47828; RAYWN2_API_TOKEN from your private secret store; RAYWN2_API_DEVICE exact identity; RAYWN2_API_CHANNEL 1-4. Set the TLS CA file/upload for a self-signed host; keep verification enabled. Import into its own tab. No deployed flows need replacing.",
+    "x": 340,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "ray-api-poll",
+    "type": "inject",
+    "z": "ray-api-v1-example",
+    "name": "Poll once (set repeat to 1 s to run)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "payload": "",
+    "payloadType": "date",
+    "x": 190,
+    "y": 100,
+    "wires": [
+      [
+        "ray-api-prepare"
+      ]
+    ]
+  },
+  {
+    "id": "ray-api-prepare",
+    "type": "function",
+    "z": "ray-api-v1-example",
+    "name": "Prepare private HTTPS request",
+    "func": "const origin = String(env.get(\"RAYWN2_API_URL\") || \"\").replace(/\\/$/, \"\");\nconst token = String(env.get(\"RAYWN2_API_TOKEN\") || \"\");\nconst device = String(env.get(\"RAYWN2_API_DEVICE\") || \"\");\nconst channel = Number(env.get(\"RAYWN2_API_CHANNEL\") || \"2\");\nif (!/^https:\\/\\/[^\\s\\/?#@]+$/.test(origin) || !/^[a-f0-9]{64}$/.test(token) || !device || !Number.isInteger(channel) || channel < 1 || channel > 4) {\n    node.status({fill:\"yellow\",shape:\"ring\",text:\"Configure API URL, token, device and channel\"});\n    return null;\n}\nmsg.url = origin + \"/api/v1/readings?device=\" + encodeURIComponent(device);\nmsg.method = \"GET\";\nmsg.headers = {Authorization:\"Bearer \" + token, Accept:\"application/json\"};\nmsg.requestTimeout = 5000;\nmsg.followRedirects = false;\nmsg.rejectUnauthorized = true;\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 450,
+    "y": 100,
+    "wires": [
+      [
+        "ray-api-http"
+      ]
+    ]
+  },
+  {
+    "id": "ray-api-http",
+    "type": "http request",
+    "z": "ray-api-v1-example",
+    "name": "GET readings (verified TLS)",
+    "method": "use",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "",
+    "tls": "ray-api-tls",
+    "persist": false,
+    "proxy": "",
+    "insecureHTTPParser": false,
+    "authType": "",
+    "senderr": false,
+    "headers": [],
+    "x": 710,
+    "y": 100,
+    "wires": [
+      [
+        "ray-api-decode"
+      ]
+    ]
+  },
+  {
+    "id": "ray-api-decode",
+    "type": "function",
+    "z": "ray-api-v1-example",
+    "name": "Select source + freshness; strip headers",
+    "func": "// Return a NEW message: never send request headers, URL or token to Debug/UI.\nconst device = String(env.get(\"RAYWN2_API_DEVICE\") || \"\");\nconst channel = Number(env.get(\"RAYWN2_API_CHANNEL\") || \"2\");\nconst empty = {device,channel,available:false,status:\"Unavailable / stale\",forward_average_W:null,forward_peak_W:null,reflected_average_W:null,reflected_peak_W:null,swr:null};\nconst body = msg.payload;\nconst d = Number(msg.statusCode) === 200 && body && body.schema === 1 && Array.isArray(body.devices) ? body.devices.find(x=>x.device === device) : null;\nconst rf = d && Array.isArray(d.rf) ? d.rf.find(x=>x.channel === channel) : null;\nif (!d || d.fresh !== true || !Number.isFinite(d.age_ms) || d.age_ms < 0 || d.age_ms >= 1500 || !rf) {\n    flow.set(\"rayApiExpiry\",0);\n    node.status({fill:\"yellow\",shape:\"ring\",text:empty.status});\n    return {payload:empty};\n}\nflow.set(\"rayApiExpiry\",Date.now() + 1500 - d.age_ms);\nconst result = {...empty,available:true,status:rf.status,received_utc:d.received_utc,source:d.source,transport:d.transport};\nfor (const key of [\"forward_average_W\",\"forward_peak_W\",\"reflected_average_W\",\"reflected_peak_W\",\"swr\"]) result[key] = Number.isFinite(rf[key]) ? rf[key] : null;\nnode.status({fill:\"green\",shape:\"dot\",text:\"Fresh \" + device + \" CH\" + channel});\nreturn {payload:result};",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 740,
+    "y": 180,
+    "wires": [
+      [
+        "ray-api-debug"
+      ]
+    ]
+  },
+  {
+    "id": "ray-api-tick",
+    "type": "inject",
+    "z": "ray-api-v1-example",
+    "name": "Expiry check every second",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "1",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "payload": "",
+    "payloadType": "date",
+    "x": 200,
+    "y": 260,
+    "wires": [
+      [
+        "ray-api-expire"
+      ]
+    ]
+  },
+  {
+    "id": "ray-api-expire",
+    "type": "function",
+    "z": "ray-api-v1-example",
+    "name": "Clear expired values",
+    "func": "if (Date.now() < (flow.get(\"rayApiExpiry\") || 0)) return null;\nreturn {payload:{device:String(env.get(\"RAYWN2_API_DEVICE\")||\"\"),channel:Number(env.get(\"RAYWN2_API_CHANNEL\")||\"2\"),available:false,status:\"Unavailable / expired\",forward_average_W:null,forward_peak_W:null,reflected_average_W:null,reflected_peak_W:null,swr:null}};",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "flow.set(\"rayApiExpiry\",0);",
+    "finalize": "",
+    "libs": [],
+    "x": 470,
+    "y": 260,
+    "wires": [
+      [
+        "ray-api-debug"
+      ]
+    ]
+  },
+  {
+    "id": "ray-api-catch",
+    "type": "catch",
+    "z": "ray-api-v1-example",
+    "name": "Request errors only",
+    "scope": [
+      "ray-api-http"
+    ],
+    "uncaught": false,
+    "x": 190,
+    "y": 340,
+    "wires": [
+      [
+        "ray-api-clear"
+      ]
+    ]
+  },
+  {
+    "id": "ray-api-clear",
+    "type": "function",
+    "z": "ray-api-v1-example",
+    "name": "Clear on request failure; strip headers",
+    "func": "flow.set(\"rayApiExpiry\",0);\nreturn {payload:{device:String(env.get(\"RAYWN2_API_DEVICE\")||\"\"),channel:Number(env.get(\"RAYWN2_API_CHANNEL\")||\"2\"),available:false,status:\"HTTPS request failed; readings cleared\",forward_average_W:null,forward_peak_W:null,reflected_average_W:null,reflected_peak_W:null,swr:null}};",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 490,
+    "y": 340,
+    "wires": [
+      [
+        "ray-api-debug"
+      ]
+    ]
+  },
+  {
+    "id": "ray-api-debug",
+    "type": "debug",
+    "z": "ray-api-v1-example",
+    "name": "Selected CH readings ONLY",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1030,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "ray-api-tls",
+    "type": "tls-config",
+    "name": "Station certificate trust (verification ON)",
+    "cert": "",
+    "key": "",
+    "ca": "",
+    "certname": "",
+    "keyname": "",
+    "caname": "",
+    "servername": "",
+    "verifyservercert": true,
+    "alpnprotocol": "http/1.1"
+  }
+]

@@ -1,0 +1,1757 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "RayWn2App Station API",
+    "version": "1.0.0",
+    "description": "Version 1 read-only Station Host HTTPS/JSON contract. Default API port 47828; desktop and service listeners default OFF. Authentication grants device identities, not channel control. This is separate from WSS, MQTT and application release numbering."
+  },
+  "servers": [
+    {
+      "url": "https://{host}:{port}",
+      "variables": {
+        "host": {
+          "default": "station.example",
+          "description": "Certificate-matching DNS name or IP address."
+        },
+        "port": {
+          "default": "47828",
+          "description": "Configured HTTPS port, separate from WSS."
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "stationBearer": []
+    }
+  ],
+  "paths": {
+    "/api/v1/status": {
+      "get": {
+        "operationId": "getStatus",
+        "summary": "Read host API status",
+        "description": "Read-only. Unknown, repeated or explicitly empty query parameters are rejected. Every response includes schema and server_utc.",
+        "parameters": [],
+        "x-reject-unknown-query-parameters": true,
+        "responses": {
+          "200": {
+            "description": "Request succeeded. Check device freshness and individual measurement validity before display.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Do not cache telemetry or errors.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "Connection": {
+                "description": "One request per connection.",
+                "schema": {
+                  "type": "string",
+                  "const": "close"
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "const": "nosniff"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                },
+                "examples": {
+                  "Status": {
+                    "$ref": "#/components/examples/Status"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "431": {
+            "$ref": "#/components/responses/Error431"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        }
+      }
+    },
+    "/api/v1/devices": {
+      "get": {
+        "operationId": "listDevices",
+        "summary": "List granted configured devices",
+        "description": "Read-only. Unknown, repeated or explicitly empty query parameters are rejected. Every response includes schema and server_utc.",
+        "parameters": [],
+        "x-reject-unknown-query-parameters": true,
+        "responses": {
+          "200": {
+            "description": "Request succeeded. Check device freshness and individual measurement validity before display.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Do not cache telemetry or errors.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "Connection": {
+                "description": "One request per connection.",
+                "schema": {
+                  "type": "string",
+                  "const": "close"
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "const": "nosniff"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevicesResponse"
+                },
+                "examples": {
+                  "Devices": {
+                    "$ref": "#/components/examples/Devices"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "431": {
+            "$ref": "#/components/responses/Error431"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        }
+      }
+    },
+    "/api/v1/readings": {
+      "get": {
+        "operationId": "getReadings",
+        "summary": "Read current calibrated measurements",
+        "description": "Read-only. Unknown, repeated or explicitly empty query parameters are rejected. Every response includes schema and server_utc.",
+        "parameters": [
+          {
+            "name": "device",
+            "in": "query",
+            "required": false,
+            "description": "Exact device identity in the token grant. UTF-8 URL-encode once.",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        ],
+        "x-reject-unknown-query-parameters": true,
+        "responses": {
+          "200": {
+            "description": "Request succeeded. Check device freshness and individual measurement validity before display.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Do not cache telemetry or errors.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "Connection": {
+                "description": "One request per connection.",
+                "schema": {
+                  "type": "string",
+                  "const": "close"
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "const": "nosniff"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadingsResponse"
+                },
+                "examples": {
+                  "LiveReadings": {
+                    "$ref": "#/components/examples/LiveReadings"
+                  },
+                  "StaleReadings": {
+                    "$ref": "#/components/examples/StaleReadings"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "431": {
+            "$ref": "#/components/responses/Error431"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        }
+      }
+    },
+    "/api/v1/history/segments": {
+      "get": {
+        "operationId": "listHistorySegments",
+        "summary": "List retained segments for a device",
+        "description": "Read-only. Unknown, repeated or explicitly empty query parameters are rejected. Every response includes schema and server_utc.",
+        "parameters": [
+          {
+            "name": "device",
+            "in": "query",
+            "required": true,
+            "description": "Exact device identity in the token grant. UTF-8 URL-encode once.",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        ],
+        "x-reject-unknown-query-parameters": true,
+        "responses": {
+          "200": {
+            "description": "Request succeeded. Check device freshness and individual measurement validity before display.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Do not cache telemetry or errors.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "Connection": {
+                "description": "One request per connection.",
+                "schema": {
+                  "type": "string",
+                  "const": "close"
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "const": "nosniff"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SegmentsResponse"
+                },
+                "examples": {
+                  "Segments": {
+                    "$ref": "#/components/examples/Segments"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "431": {
+            "$ref": "#/components/responses/Error431"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        }
+      }
+    },
+    "/api/v1/history/page": {
+      "get": {
+        "operationId": "getHistoryPage",
+        "summary": "Read a fixed-boundary page of station history",
+        "description": "Read-only. Unknown, repeated or explicitly empty query parameters are rejected. Every response includes schema and server_utc.",
+        "parameters": [
+          {
+            "name": "device",
+            "in": "query",
+            "required": true,
+            "description": "Exact device identity in the token grant. UTF-8 URL-encode once.",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          },
+          {
+            "name": "segment",
+            "in": "query",
+            "required": true,
+            "description": "Name returned by history/segments, never a filesystem path.",
+            "schema": {
+              "type": "string",
+              "pattern": "^station-[0-9]{8}-[0-9]{9}-[a-f0-9]{32}\\.csv$"
+            }
+          },
+          {
+            "name": "channel",
+            "in": "query",
+            "required": false,
+            "description": "0 means all channels, 1–4 selects one RF channel.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4,
+              "default": 0
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Start at 0, then use the returned next cursor. Arbitrary offsets can fail with 409.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2097152,
+              "default": 0
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": false,
+            "description": "Start at 0 to capture a boundary, then preserve the returned end. A nonzero offset requires a nonzero end.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2097152,
+              "default": 0
+            }
+          }
+        ],
+        "x-reject-unknown-query-parameters": true,
+        "responses": {
+          "200": {
+            "description": "Request succeeded. Check device freshness and individual measurement validity before display.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Do not cache telemetry or errors.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "Connection": {
+                "description": "One request per connection.",
+                "schema": {
+                  "type": "string",
+                  "const": "close"
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "const": "nosniff"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryPageResponse"
+                },
+                "examples": {
+                  "HistoryPage": {
+                    "$ref": "#/components/examples/HistoryPage"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "431": {
+            "$ref": "#/components/responses/Error431"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "stationBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "opaque 64-character lowercase hexadecimal token",
+        "description": "Send the exact Authorization: Bearer TOKEN header over verified TLS. Tokens are locally issued and revoked, never sent as URL/query parameters or cookies. No OAuth flows."
+      }
+    },
+    "schemas": {
+      "RfChannel": {
+        "type": "object",
+        "description": "",
+        "required": [
+          "channel",
+          "coupler",
+          "profile",
+          "status",
+          "power_status",
+          "forward_average_W",
+          "reflected_average_W",
+          "forward_peak_W",
+          "reflected_peak_W",
+          "swr",
+          "return_loss_dB"
+        ],
+        "properties": {
+          "channel": {
+            "type": "integer",
+            "description": "One-based RF channel.",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "coupler": {
+            "type": "string",
+            "description": "Configured coupler model; None means not configured."
+          },
+          "profile": {
+            "type": "string",
+            "description": "Configured calibration profile identity; not proof of physical qualification."
+          },
+          "status": {
+            "type": "string",
+            "description": "Human-readable measurement condition. Do not branch on exact wording."
+          },
+          "power_status": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "valid",
+                "clipped",
+                "invalid_count",
+                "invalid_calibration"
+              ]
+            },
+            "description": "Validity in forward average, reflected average, forward peak, reflected peak order.",
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "forward_average_W": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Forward average power in watts, or null if unusable."
+          },
+          "reflected_average_W": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Reflected average power in watts, or null if unusable."
+          },
+          "forward_peak_W": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Forward peak power in watts. Host measurement, not a client software-held peak."
+          },
+          "reflected_peak_W": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Reflected peak power in watts. Independent of forward peak."
+          },
+          "swr": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "SWR ratio; null at Low RF, invalid data or nonfinite result."
+          },
+          "return_loss_dB": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Return loss in dB; null if invalid/nonfinite. Can be negative."
+          }
+        },
+        "additionalProperties": true
+      },
+      "Protection": {
+        "type": "object",
+        "description": "",
+        "required": [
+          "trip",
+          "description"
+        ],
+        "properties": {
+          "trip": {
+            "type": "string",
+            "description": "Recognized fresh relay status only; unknown remains unknown.",
+            "enum": [
+              "tripped",
+              "not_tripped",
+              "unknown"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Advisory host protection description, not physical contact verification."
+          }
+        },
+        "additionalProperties": true
+      },
+      "DeviceSummary": {
+        "type": "object",
+        "description": "",
+        "required": [
+          "device",
+          "transport",
+          "source",
+          "fresh",
+          "connected",
+          "state",
+          "age_ms",
+          "received_utc",
+          "frame",
+          "protection"
+        ],
+        "properties": {
+          "device": {
+            "type": "string",
+            "description": "Exact granted device identity; do not use the toolbar selection as an identity.",
+            "minLength": 1
+          },
+          "transport": {
+            "type": "string",
+            "description": "Host transport label, for example VCP, D2XX, Emulator or Replay."
+          },
+          "source": {
+            "type": "string",
+            "description": "Separates physical hardware from simulated/replay data.",
+            "enum": [
+              "physical",
+              "simulated",
+              "replay"
+            ]
+          },
+          "fresh": {
+            "type": "boolean",
+            "description": "Current host freshness flag. HTTP success does not imply this is true."
+          },
+          "connected": {
+            "type": "boolean",
+            "description": "Transport connection state; a connected device can have stale measurements."
+          },
+          "state": {
+            "type": "string",
+            "description": "Human-readable session state; do not parse exact wording."
+          },
+          "age_ms": {
+            "type": "integer",
+            "description": "Host-observed sample age in milliseconds; -1 means no sample yet.",
+            "minimum": -1
+          },
+          "received_utc": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Host receipt time of the latest sample, not the response time. Null before first sample."
+          },
+          "frame": {
+            "type": "string",
+            "description": "Decimal-string telemetry counter. It can restart with a new session; it is not a globally unique cursor.",
+            "pattern": "^[0-9]+$"
+          },
+          "protection": {
+            "$ref": "#/components/schemas/Protection"
+          }
+        },
+        "additionalProperties": true
+      },
+      "Input": {
+        "type": "object",
+        "description": "",
+        "required": [
+          "input",
+          "label",
+          "unit",
+          "valid",
+          "value"
+        ],
+        "properties": {
+          "input": {
+            "type": "string",
+            "description": "Input identity.",
+            "enum": [
+              "analog1",
+              "analog2",
+              "analog3",
+              "analog4",
+              "dc_voltage",
+              "dc_current"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "description": "Configured operator label."
+          },
+          "unit": {
+            "type": "string",
+            "description": "Configured display unit, for example V, A, °C or °F. Never assume every analog input is volts."
+          },
+          "valid": {
+            "type": "boolean",
+            "description": "Whether this configured input conversion is usable in this sample."
+          },
+          "value": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Configured value in unit, or null when invalid/stale. Zero is a value."
+          }
+        },
+        "additionalProperties": true
+      },
+      "DigitalInput": {
+        "type": "object",
+        "description": "",
+        "required": [
+          "input",
+          "label",
+          "value"
+        ],
+        "properties": {
+          "input": {
+            "type": "integer",
+            "description": "One-based digital input.",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "label": {
+            "type": "string",
+            "description": "Configured operator label."
+          },
+          "value": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "enum": [
+              0,
+              1,
+              null
+            ],
+            "description": "Configured logical state encoded as 0 or 1 including inversion; null when stale. API v1 does not serialize this field as a JSON boolean."
+          }
+        },
+        "additionalProperties": true
+      },
+      "DeviceReading": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DeviceSummary"
+          },
+          {
+            "type": "object",
+            "description": "",
+            "required": [
+              "rf",
+              "inputs",
+              "digital_inputs"
+            ],
+            "properties": {
+              "rf": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RfChannel"
+                },
+                "description": "Four RF channel records.",
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "inputs": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Input"
+                },
+                "description": "Analog 1–4, DC voltage and DC current.",
+                "minItems": 6,
+                "maxItems": 6
+              },
+              "digital_inputs": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DigitalInput"
+                },
+                "description": "Four digital input records.",
+                "minItems": 4,
+                "maxItems": 4
+              }
+            },
+            "additionalProperties": true
+          }
+        ]
+      },
+      "StatusResponse": {
+        "type": "object",
+        "description": "",
+        "required": [
+          "schema",
+          "server_utc",
+          "read_only",
+          "history_available",
+          "device_count",
+          "certificate_sha256"
+        ],
+        "properties": {
+          "schema": {
+            "type": "integer",
+            "description": "Payload schema version; independent of the application release.",
+            "const": 1
+          },
+          "server_utc": {
+            "type": "string",
+            "description": "UTC timestamp generated by the host, in RFC 3339 format.",
+            "format": "date-time"
+          },
+          "read_only": {
+            "type": "boolean",
+            "const": true,
+            "description": "No hardware command endpoints exist."
+          },
+          "history_available": {
+            "type": "boolean",
+            "description": "Whether a history directory is configured; not a guarantee of files or writable storage."
+          },
+          "device_count": {
+            "type": "integer",
+            "description": "Currently configured devices within this token grant.",
+            "minimum": 0,
+            "maximum": 16
+          },
+          "certificate_sha256": {
+            "type": "string",
+            "description": "Lowercase SHA-256 digest of the host TLS certificate.",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": true
+      },
+      "DevicesResponse": {
+        "type": "object",
+        "description": "",
+        "required": [
+          "schema",
+          "server_utc",
+          "devices"
+        ],
+        "properties": {
+          "schema": {
+            "type": "integer",
+            "description": "Payload schema version; independent of the application release.",
+            "const": 1
+          },
+          "server_utc": {
+            "type": "string",
+            "description": "UTC timestamp generated by the host, in RFC 3339 format.",
+            "format": "date-time"
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeviceSummary"
+            },
+            "description": "Configured devices visible to this token; never a grant to undisclosed devices.",
+            "maxItems": 16
+          }
+        },
+        "additionalProperties": true
+      },
+      "ReadingsResponse": {
+        "type": "object",
+        "description": "",
+        "required": [
+          "schema",
+          "server_utc",
+          "devices"
+        ],
+        "properties": {
+          "schema": {
+            "type": "integer",
+            "description": "Payload schema version; independent of the application release.",
+            "const": 1
+          },
+          "server_utc": {
+            "type": "string",
+            "description": "UTC timestamp generated by the host, in RFC 3339 format.",
+            "format": "date-time"
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeviceReading"
+            },
+            "description": "Current readings for all granted configured devices, or the selected device.",
+            "maxItems": 16
+          }
+        },
+        "additionalProperties": true
+      },
+      "SegmentsResponse": {
+        "type": "object",
+        "description": "",
+        "required": [
+          "schema",
+          "server_utc",
+          "segments"
+        ],
+        "properties": {
+          "schema": {
+            "type": "integer",
+            "description": "Payload schema version; independent of the application release.",
+            "const": 1
+          },
+          "server_utc": {
+            "type": "string",
+            "description": "UTC timestamp generated by the host, in RFC 3339 format.",
+            "format": "date-time"
+          },
+          "segments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^station-[0-9]{8}-[0-9]{9}-[a-f0-9]{32}\\.csv$"
+            },
+            "description": "Up to 128 retained segments for the requested device, newest name first.",
+            "maxItems": 128
+          }
+        },
+        "additionalProperties": true
+      },
+      "HistoryPageResponse": {
+        "type": "object",
+        "description": "",
+        "required": [
+          "schema",
+          "server_utc",
+          "columns",
+          "rows",
+          "next",
+          "end",
+          "more"
+        ],
+        "properties": {
+          "schema": {
+            "type": "integer",
+            "description": "Payload schema version; independent of the application release.",
+            "const": 1
+          },
+          "server_utc": {
+            "type": "string",
+            "description": "UTC timestamp generated by the host, in RFC 3339 format.",
+            "format": "date-time"
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "const": [
+              "recorded_utc",
+              "sample_utc",
+              "device",
+              "source",
+              "sequence",
+              "link",
+              "protection",
+              "channel",
+              "coupler",
+              "profile",
+              "rf_status",
+              "forward_avg_w",
+              "reflected_avg_w",
+              "forward_peak_w",
+              "reflected_peak_w",
+              "swr",
+              "return_loss_db",
+              "dc_v",
+              "dc_a",
+              "analog1",
+              "analog1_unit",
+              "analog2",
+              "analog2_unit",
+              "analog3",
+              "analog3_unit",
+              "analog4",
+              "analog4_unit",
+              "digital_raw_bits"
+            ],
+            "description": "Ordered CSV column names. Row cells correspond to these names."
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 28,
+              "maxItems": 28
+            },
+            "description": "CSV cells, all strings. Empty measurement cells mean unavailable, not zero.",
+            "maxItems": 64
+          },
+          "next": {
+            "type": "integer",
+            "description": "Byte cursor for the next page. Always use the returned cursor, including for an empty filtered page.",
+            "minimum": 0,
+            "maximum": 2097152
+          },
+          "end": {
+            "type": "integer",
+            "description": "Fixed segment byte boundary. Retain for the whole export.",
+            "minimum": 0,
+            "maximum": 2097152
+          },
+          "more": {
+            "type": "boolean",
+            "description": "Continue until false; rows can be empty while more is true."
+          }
+        },
+        "additionalProperties": true
+      },
+      "Error": {
+        "type": "object",
+        "description": "",
+        "required": [
+          "schema",
+          "server_utc",
+          "error"
+        ],
+        "properties": {
+          "schema": {
+            "type": "integer",
+            "description": "Payload schema version; independent of the application release.",
+            "const": 1
+          },
+          "server_utc": {
+            "type": "string",
+            "description": "UTC timestamp generated by the host, in RFC 3339 format.",
+            "format": "date-time"
+          },
+          "error": {
+            "type": "string",
+            "description": "Diagnostic string. May be a short code or human-readable history error. Exact wording is not a stable enum."
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "responses": {
+      "Error400": {
+        "description": "Malformed request, unsupported body, unknown/repeated/empty query parameter, invalid cursor or segment.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Do not cache telemetry or errors.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          },
+          "Connection": {
+            "description": "One request per connection.",
+            "schema": {
+              "type": "string",
+              "const": "close"
+            }
+          },
+          "X-Content-Type-Options": {
+            "schema": {
+              "type": "string",
+              "const": "nosniff"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error401": {
+        "description": "Missing, malformed, revoked or unrecognized bearer token.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Do not cache telemetry or errors.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          },
+          "Connection": {
+            "description": "One request per connection.",
+            "schema": {
+              "type": "string",
+              "const": "close"
+            }
+          },
+          "X-Content-Type-Options": {
+            "schema": {
+              "type": "string",
+              "const": "nosniff"
+            }
+          },
+          "WWW-Authenticate": {
+            "schema": {
+              "type": "string"
+            },
+            "description": "Bearer authentication challenge."
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error403": {
+        "description": "Requested device is outside the token grant.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Do not cache telemetry or errors.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          },
+          "Connection": {
+            "description": "One request per connection.",
+            "schema": {
+              "type": "string",
+              "const": "close"
+            }
+          },
+          "X-Content-Type-Options": {
+            "schema": {
+              "type": "string",
+              "const": "nosniff"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error404": {
+        "description": "Unknown route or explicitly selected granted device is no longer configured.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Do not cache telemetry or errors.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          },
+          "Connection": {
+            "description": "One request per connection.",
+            "schema": {
+              "type": "string",
+              "const": "close"
+            }
+          },
+          "X-Content-Type-Options": {
+            "schema": {
+              "type": "string",
+              "const": "nosniff"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error405": {
+        "description": "Authenticated request uses a method other than GET.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Do not cache telemetry or errors.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          },
+          "Connection": {
+            "description": "One request per connection.",
+            "schema": {
+              "type": "string",
+              "const": "close"
+            }
+          },
+          "X-Content-Type-Options": {
+            "schema": {
+              "type": "string",
+              "const": "nosniff"
+            }
+          },
+          "Allow": {
+            "schema": {
+              "type": "string",
+              "const": "GET"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error409": {
+        "description": "History file unavailable, rotated, truncated or incompatible; refresh the segment list.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Do not cache telemetry or errors.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          },
+          "Connection": {
+            "description": "One request per connection.",
+            "schema": {
+              "type": "string",
+              "const": "close"
+            }
+          },
+          "X-Content-Type-Options": {
+            "schema": {
+              "type": "string",
+              "const": "nosniff"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error431": {
+        "description": "Request headers exceed 8192 bytes.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Do not cache telemetry or errors.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          },
+          "Connection": {
+            "description": "One request per connection.",
+            "schema": {
+              "type": "string",
+              "const": "close"
+            }
+          },
+          "X-Content-Type-Options": {
+            "schema": {
+              "type": "string",
+              "const": "nosniff"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error503": {
+        "description": "History not configured, history worker/response capacity limit or certificate condition. A configured history directory failure can return 409.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Do not cache telemetry or errors.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          },
+          "Connection": {
+            "description": "One request per connection.",
+            "schema": {
+              "type": "string",
+              "const": "close"
+            }
+          },
+          "X-Content-Type-Options": {
+            "schema": {
+              "type": "string",
+              "const": "nosniff"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "examples": {
+      "Status": {
+        "summary": "Illustrative Status (not station configuration)",
+        "x-response-schema": "StatusResponse",
+        "value": {
+          "schema": 1,
+          "server_utc": "2026-01-01T00:00:00.100Z",
+          "read_only": true,
+          "history_available": true,
+          "device_count": 1,
+          "certificate_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "Devices": {
+        "summary": "Illustrative Devices (not station configuration)",
+        "x-response-schema": "DevicesResponse",
+        "value": {
+          "schema": 1,
+          "server_utc": "2026-01-01T00:00:00.100Z",
+          "devices": [
+            {
+              "device": "EXAMPLE-WN2",
+              "transport": "Emulator",
+              "source": "simulated",
+              "fresh": true,
+              "connected": true,
+              "state": "Live",
+              "age_ms": 100,
+              "received_utc": "2026-01-01T00:00:00.000Z",
+              "frame": "42",
+              "protection": {
+                "trip": "unknown",
+                "description": "Illustrative unknown relay state"
+              }
+            }
+          ]
+        }
+      },
+      "LiveReadings": {
+        "summary": "Illustrative LiveReadings (not station configuration)",
+        "x-response-schema": "ReadingsResponse",
+        "value": {
+          "schema": 1,
+          "server_utc": "2026-01-01T00:00:00.100Z",
+          "devices": [
+            {
+              "device": "EXAMPLE-WN2",
+              "transport": "Emulator",
+              "source": "simulated",
+              "fresh": true,
+              "connected": true,
+              "state": "Live",
+              "age_ms": 100,
+              "received_utc": "2026-01-01T00:00:00.000Z",
+              "frame": "42",
+              "protection": {
+                "trip": "unknown",
+                "description": "Illustrative unknown relay state"
+              },
+              "rf": [
+                {
+                  "channel": 1,
+                  "coupler": "LP-1",
+                  "profile": "Illustrative example profile",
+                  "status": "Low RF",
+                  "power_status": [
+                    "valid",
+                    "valid",
+                    "valid",
+                    "valid"
+                  ],
+                  "forward_average_W": 0.0,
+                  "reflected_average_W": 0.0,
+                  "forward_peak_W": 0.0,
+                  "reflected_peak_W": 0.0,
+                  "swr": null,
+                  "return_loss_dB": null
+                },
+                {
+                  "channel": 2,
+                  "coupler": "LP-1",
+                  "profile": "Illustrative example profile",
+                  "status": "Example RF on",
+                  "power_status": [
+                    "valid",
+                    "valid",
+                    "valid",
+                    "valid"
+                  ],
+                  "forward_average_W": 10.0,
+                  "reflected_average_W": 0.1,
+                  "forward_peak_W": 12.0,
+                  "reflected_peak_W": 0.12,
+                  "swr": 1.2222222222,
+                  "return_loss_dB": 20.0
+                },
+                {
+                  "channel": 3,
+                  "coupler": "LP-1",
+                  "profile": "Illustrative example profile",
+                  "status": "Low RF",
+                  "power_status": [
+                    "valid",
+                    "valid",
+                    "valid",
+                    "valid"
+                  ],
+                  "forward_average_W": 0.0,
+                  "reflected_average_W": 0.0,
+                  "forward_peak_W": 0.0,
+                  "reflected_peak_W": 0.0,
+                  "swr": null,
+                  "return_loss_dB": null
+                },
+                {
+                  "channel": 4,
+                  "coupler": "LP-1",
+                  "profile": "Illustrative example profile",
+                  "status": "Low RF",
+                  "power_status": [
+                    "valid",
+                    "valid",
+                    "valid",
+                    "valid"
+                  ],
+                  "forward_average_W": 0.0,
+                  "reflected_average_W": 0.0,
+                  "forward_peak_W": 0.0,
+                  "reflected_peak_W": 0.0,
+                  "swr": null,
+                  "return_loss_dB": null
+                }
+              ],
+              "inputs": [
+                {
+                  "input": "analog1",
+                  "label": "analog1",
+                  "unit": "°C",
+                  "valid": true,
+                  "value": 25.0
+                },
+                {
+                  "input": "analog2",
+                  "label": "analog2",
+                  "unit": "V",
+                  "valid": true,
+                  "value": 1.2
+                },
+                {
+                  "input": "analog3",
+                  "label": "analog3",
+                  "unit": "V",
+                  "valid": true,
+                  "value": 0.0
+                },
+                {
+                  "input": "analog4",
+                  "label": "analog4",
+                  "unit": "V",
+                  "valid": true,
+                  "value": 0.0
+                },
+                {
+                  "input": "dc_voltage",
+                  "label": "dc_voltage",
+                  "unit": "V",
+                  "valid": true,
+                  "value": 13.8
+                },
+                {
+                  "input": "dc_current",
+                  "label": "dc_current",
+                  "unit": "A",
+                  "valid": true,
+                  "value": 2.5
+                }
+              ],
+              "digital_inputs": [
+                {
+                  "input": 1,
+                  "label": "Input 1",
+                  "value": 0
+                },
+                {
+                  "input": 2,
+                  "label": "Input 2",
+                  "value": 1
+                },
+                {
+                  "input": 3,
+                  "label": "Input 3",
+                  "value": 0
+                },
+                {
+                  "input": 4,
+                  "label": "Input 4",
+                  "value": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "StaleReadings": {
+        "summary": "Illustrative StaleReadings (not station configuration)",
+        "x-response-schema": "ReadingsResponse",
+        "value": {
+          "schema": 1,
+          "server_utc": "2026-01-01T00:00:02.000Z",
+          "devices": [
+            {
+              "device": "EXAMPLE-WN2",
+              "transport": "Emulator",
+              "source": "simulated",
+              "fresh": false,
+              "connected": true,
+              "state": "Waiting for fresh data",
+              "age_ms": 2000,
+              "received_utc": "2026-01-01T00:00:00.000Z",
+              "frame": "42",
+              "protection": {
+                "trip": "unknown",
+                "description": "Illustrative unknown relay state"
+              },
+              "rf": [
+                {
+                  "channel": 1,
+                  "coupler": "LP-1",
+                  "profile": "Illustrative example profile",
+                  "status": "Low RF",
+                  "power_status": [
+                    "valid",
+                    "valid",
+                    "valid",
+                    "valid"
+                  ],
+                  "forward_average_W": null,
+                  "reflected_average_W": null,
+                  "forward_peak_W": null,
+                  "reflected_peak_W": null,
+                  "swr": null,
+                  "return_loss_dB": null
+                },
+                {
+                  "channel": 2,
+                  "coupler": "LP-1",
+                  "profile": "Illustrative example profile",
+                  "status": "Example RF on",
+                  "power_status": [
+                    "valid",
+                    "valid",
+                    "valid",
+                    "valid"
+                  ],
+                  "forward_average_W": null,
+                  "reflected_average_W": null,
+                  "forward_peak_W": null,
+                  "reflected_peak_W": null,
+                  "swr": null,
+                  "return_loss_dB": null
+                },
+                {
+                  "channel": 3,
+                  "coupler": "LP-1",
+                  "profile": "Illustrative example profile",
+                  "status": "Low RF",
+                  "power_status": [
+                    "valid",
+                    "valid",
+                    "valid",
+                    "valid"
+                  ],
+                  "forward_average_W": null,
+                  "reflected_average_W": null,
+                  "forward_peak_W": null,
+                  "reflected_peak_W": null,
+                  "swr": null,
+                  "return_loss_dB": null
+                },
+                {
+                  "channel": 4,
+                  "coupler": "LP-1",
+                  "profile": "Illustrative example profile",
+                  "status": "Low RF",
+                  "power_status": [
+                    "valid",
+                    "valid",
+                    "valid",
+                    "valid"
+                  ],
+                  "forward_average_W": null,
+                  "reflected_average_W": null,
+                  "forward_peak_W": null,
+                  "reflected_peak_W": null,
+                  "swr": null,
+                  "return_loss_dB": null
+                }
+              ],
+              "inputs": [
+                {
+                  "input": "analog1",
+                  "label": "analog1",
+                  "unit": "°C",
+                  "valid": false,
+                  "value": null
+                },
+                {
+                  "input": "analog2",
+                  "label": "analog2",
+                  "unit": "V",
+                  "valid": false,
+                  "value": null
+                },
+                {
+                  "input": "analog3",
+                  "label": "analog3",
+                  "unit": "V",
+                  "valid": false,
+                  "value": null
+                },
+                {
+                  "input": "analog4",
+                  "label": "analog4",
+                  "unit": "V",
+                  "valid": false,
+                  "value": null
+                },
+                {
+                  "input": "dc_voltage",
+                  "label": "dc_voltage",
+                  "unit": "V",
+                  "valid": false,
+                  "value": null
+                },
+                {
+                  "input": "dc_current",
+                  "label": "dc_current",
+                  "unit": "A",
+                  "valid": false,
+                  "value": null
+                }
+              ],
+              "digital_inputs": [
+                {
+                  "input": 1,
+                  "label": "Input 1",
+                  "value": null
+                },
+                {
+                  "input": 2,
+                  "label": "Input 2",
+                  "value": null
+                },
+                {
+                  "input": 3,
+                  "label": "Input 3",
+                  "value": null
+                },
+                {
+                  "input": 4,
+                  "label": "Input 4",
+                  "value": null
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "Segments": {
+        "summary": "Illustrative Segments (not station configuration)",
+        "x-response-schema": "SegmentsResponse",
+        "value": {
+          "schema": 1,
+          "server_utc": "2026-01-01T00:00:00.100Z",
+          "segments": [
+            "station-20260101-000000000-00000000000000000000000000000000.csv"
+          ]
+        }
+      },
+      "HistoryPage": {
+        "summary": "Illustrative HistoryPage (not station configuration)",
+        "x-response-schema": "HistoryPageResponse",
+        "value": {
+          "schema": 1,
+          "server_utc": "2026-01-01T00:00:00.100Z",
+          "columns": [
+            "recorded_utc",
+            "sample_utc",
+            "device",
+            "source",
+            "sequence",
+            "link",
+            "protection",
+            "channel",
+            "coupler",
+            "profile",
+            "rf_status",
+            "forward_avg_w",
+            "reflected_avg_w",
+            "forward_peak_w",
+            "reflected_peak_w",
+            "swr",
+            "return_loss_db",
+            "dc_v",
+            "dc_a",
+            "analog1",
+            "analog1_unit",
+            "analog2",
+            "analog2_unit",
+            "analog3",
+            "analog3_unit",
+            "analog4",
+            "analog4_unit",
+            "digital_raw_bits"
+          ],
+          "rows": [
+            [
+              "2026-01-01T00:00:00.100Z",
+              "2026-01-01T00:00:00.000Z",
+              "EXAMPLE-WN2",
+              "Emulator",
+              "42",
+              "Live",
+              "Unknown",
+              "2",
+              "LP-1",
+              "Illustrative profile",
+              "Example RF on",
+              "10",
+              "0.1",
+              "12",
+              "0.12",
+              "1.2222222222",
+              "20",
+              "13.8",
+              "2.5",
+              "25",
+              "°C",
+              "1.2",
+              "V",
+              "0",
+              "V",
+              "0",
+              "V",
+              "0"
+            ]
+          ],
+          "next": 483,
+          "end": 483,
+          "more": false
+        }
+      }
+    }
+  }
+}

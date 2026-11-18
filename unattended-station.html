@@ -3,6 +3,20 @@
 <p><b>RayWn2StationHost</b> runs as a native Windows service or a separate Linux service for a station or repeater that should keep monitoring when nobody is logged in. It owns the WN-2 USB connection, shares live readings with paired RayWn2App clients, and records CSV history on the Pi even when no clients are connected.</p>
 <h2 id="windows-service">Windows Station Host service</h2>
 <p>A dedicated Station Host can monitor the meter without a desktop login. Its settings are separate from your normal RayWn2App settings. Install the WaveNode <a href="platform-windows.html">Windows USB drivers</a> first. VCP may need the additional USB Serial driver step. With RF off, disconnect the meter in the desktop app before starting the service. Both cannot use the same meter at once.</p>
+<h3 id="release-usb-for-desktop">Cannot connect from the desktop app? Check the service</h3>
+<p><b>One program owns each physical WN-2 USB connection.</b> A running Station Host service can keep the meter open even when its desktop window is closed. Installing or opening RayWn2App does not stop an existing service. This applies to both D2XX and VCP.</p>
+<ol>
+<li>Open the Windows Start menu, search for <b>Services</b>, and open it. Look for your RayWn2 Station Host service. Its installed name may differ; the Alpha review setup used <b>RayWn2StationReview</b>, while the normal default is <b>RayWn2StationHost</b>.</li>
+<li>If you want direct USB access in the desktop app, select the matching service and choose <b>Stop</b>. Approve administrator access if requested. Wait until its status is no longer Running, then use <b>Discover → select the meter → Connect</b> in RayWn2App.</li>
+<li>If the service should keep monitoring, leave it running and connect the desktop app as a <a href="remote-client.html">Remote Client</a> instead of opening the local USB device.</li>
+</ol>
+<p>Stopping the service disconnects its remote viewers and pauses its recording and MQTT publishing. Saved settings, pairings and recorded history are retained. RayWn2App does not currently stop a Windows service from its own controls.</p>
+<p>Alternatively, open <b>PowerShell as administrator</b>. Check these common names, then stop only the service that owns your meter. Substitute your installation's name when different:</p>
+<pre>Get-Service -Name RayWn2StationHost,RayWn2StationReview `
+  -ErrorAction SilentlyContinue
+Stop-Service -Name RayWn2StationReview
+Get-Service -Name RayWn2StationReview</pre>
+<p><b>Stop</b> does not change startup type. If an automatically started service should remain off after reboot, open its Properties in Windows Services and set <b>Startup type → Manual</b>. To resume unattended monitoring, first Disconnect the meter in the desktop app, then Start the service in Windows Services. Remote viewers can reconnect when it is ready.</p>
 <ol>
 <li>Use the supplied Station Host runtime and reviewed station configuration. Supply your exact WN-2 serial, VCP or D2XX, TLS certificate and key, and listen address. The <a href="remote-certificates.html">TLS setup instructions</a> explain certificate generation. Keep the same certificate and state across restarts.</li>
 <li>Run the supplied <b>station-service.ps1</b> installation script in <b>PowerShell as administrator</b>. It installs a dedicated passwordless service account, protects configuration and key files, and leaves the service stopped with Manual startup. It does not change firewall rules.</li>
@@ -27,7 +41,7 @@ $stationConfig = Join-Path $env:ProgramData "$folder\station.json"
 <p>The code expires after two minutes. Keep pairing codes and API tokens private. For an optional enabled HTTPS API, use <b>--api-token WN2_SERIAL</b> and <b>--api-revoke-all</b>. For a custom service name, use <b>-ServiceName NAME</b> with the script and <b>--service-name NAME</b> with the executable.</p>
 <p>Recorded CSV segments are in the service's private <b>state\history</b> folder under ProgramData. Browse/export them from the Remote Client. The private <b>state\station-host.log</b> and Windows Services help diagnose startup and connection failures. A Running service may be waiting for a meter: check status as well. Remove stops and unregisters the service while preserving its settings, TLS identity and history:</p>
 <pre>.\station-service.ps1 -Action Remove</pre>
-<p>Windows service setup is independent of the desktop Station Host. This service provides WSS, optional HTTPS and recorded history. It does not run desktop email, audio or MQTT publishing.</p>
+<p>Windows service setup is independent of the desktop Station Host. This service provides WSS, optional HTTPS and recorded history. It does not run desktop email or audio. Optional service MQTT publishing has its own configuration; see <a href="#service-mqtt">unattended MQTT</a>.</p>
 <h2 id="raspberry-pi-service">Raspberry Pi Station Host service</h2>
 <h2 id="prepare-the-station">Prepare the station</h2>
 <ol>
@@ -63,7 +77,7 @@ sudo systemctl disable --now raywn2-station@pi</pre>
 <p>Run the station commands as the service account. Use your WN-2’s exact serial in place of <b>WN2_SERIAL</b>. The status command shows the listener, certificate fingerprint, and device state. An invitation expires in two minutes and can be used once.</p>
 <pre>RayWn2StationHost --config /etc/raywn2/pi.json --status
 RayWn2StationHost --config /etc/raywn2/pi.json --invite WN2_SERIAL</pre>
-<p>On the client, open <b>Tools → Remote Station → Remote Client</b>. Enter the Pi’s WSS address and port, the verified SHA-256 fingerprint, and the invitation code. In <b>Instrument Properties</b>, choose the remote identity ending in your WN-2 serial and confirm the RF channel. A running client can reconnect after a Pi reboot using its existing pairing. Opening a new desktop client session requires a fresh invitation.</p>
+<p>On the client, open <b>Tools → Remote Station → Remote Client</b>. Enter the Pi’s WSS address and port, the verified SHA-256 fingerprint, and the invitation code. In <b>Instrument Properties</b>, choose the remote identity ending in your WN-2 serial and confirm the RF channel. A running client can reconnect after a Pi reboot using its existing pairing. A restarted client can reuse a saved profile when Remember pairing was selected and the host retains its grant; otherwise create a fresh invitation.</p>
 <p>To close access for all paired clients, run the command below. Each client will need a new invitation.</p>
 <pre>RayWn2StationHost --config /etc/raywn2/pi.json --revoke-all</pre>
 <h2 id="history-and-recovery">History and recovery</h2>
@@ -72,5 +86,15 @@ RayWn2StationHost --config /etc/raywn2/pi.json --invite WN2_SERIAL</pre>
 <p>Open the <b>history</b> folder inside the station’s configured state directory. Each interval records one row per RF channel, with timestamps, identity, link and relay status, RF, DC and auxiliary values. Blank measurement cells indicate unavailable data. The host limits the number of 2 MiB CSV segments according to its retention setting. Copy files you want to keep before they rotate out.</p>
 <p>If the WN-2 disappears, the host keeps retrying the configured identity and transport. The paired client shows unavailable readings until fresh telemetry returns. If recording stops, check the service journal for storage errors and confirm the state directory is writable. The recorder retries after 30 seconds. An unknown relay status indicates the host did not receive a recognized relay status value.</p>
 <p>For direct access by monitoring software, see the optional <a href="remote-api.html">read-only HTTPS / JSON API</a>.</p>
+<h2 id="packaged-service">Service files in Alpha v0.0.2</h2>
+<p>The Windows installation contains a <b>StationHost</b> folder with the separate runtime, installation script, masked password helper and an example configuration. The desktop installer does not start a service. The Linux bundle includes a <b>station-host</b> launcher and <b>install-station-service.sh</b>. Run the latter from the installed bundle with your private configuration path to prepare an optional user service. It leaves the service stopped and disabled. An existing service is preserved. Review and test it before enabling boot startup.</p>
+<h2 id="service-mqtt">Optional unattended MQTT publishing</h2>
+<p>A Station Host can publish without a desktop login. MQTT defaults <b>OFF</b>. Configure the broker, TLS, a unique publisher ID, topic base, username and interval in the private station configuration. Use a publish-only broker account. It publishes the same identified measurements and availability as the desktop app; see <a href="mqtt.html">MQTT setup</a> and <a href="node-red.html">Node-RED</a>. A broker failure does not stop WSS, HTTPS or history recording.</p>
+<p>Never enter passwords in the configuration file. On Windows, run the supplied <b>set-mqtt-password.ps1</b> helper in administrator PowerShell with the installed host executable and configuration paths. It prompts without showing the password and uses Windows encryption in the protected service state directory. On Linux, run the command below as the service user. The credential is stored in an owner-only file inside the private state directory, separately from desktop saved passwords. Restart the service after provisioning. Keep TLS certificate verification enabled; service certificate trust can differ from desktop trust.</p>
+<pre>systemd-ask-password 'Station MQTT password:' |
+  ./station-host \
+    --config /absolute/private/station.json \
+    --mqtt-password-stdin</pre>
+<p>Missing or mismatched credentials leave MQTT stopped with a diagnostic. The service continues acquiring and recording. Once configured, broker reconnect is automatic. Change <b>mqtt.enabled</b> to false and restart to disable publishing. The runtime guide supplied in the StationHost folder lists the configuration fields and service commands.</p>
 <hr><p><a href="remote-access.html">Remote station viewing</a> · <a href="index.html">Help home</a></p>
 <footer>RayWn2App operator guide · RF StateSide LLC<br>Shared with the application’s offline Help. <a href="LICENSE">LGPL-3.0-only</a></footer></main><dialog id="image-dialog" aria-label="Help illustration"><div class="zoom"><button id="out" aria-label="Zoom out">−</button><button id="in" aria-label="Zoom in">+</button><button id="actual">100%</button><button id="fit">Fit</button><span id="percent"></span><button id="close">Close</button></div><div id="image-scroll"><img id="enlarged" alt=""></div></dialog></body></html>

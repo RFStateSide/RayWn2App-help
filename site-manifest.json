@@ -11,7 +11,7 @@
     "audio-messages.html": "3e27f6768a5eb9482b654a2636af1e49771681613ed4cd1f475fa58241f3d5d5",
     "auxiliary.html": "3e2db115990d1eb086be71c601eaa6f85f82b575a09253c1dfa86e690c2d7bc3",
     "comparison-curves.html": "8efa689f510964ab1459e6e9405b8142c42fc5a18b924235142b0b8640ff1556",
-    "connections.html": "c3f49ee7d353762da966bed9a341c85eab199cda8b47483950a0b6b3ac1e942e",
+    "connections.html": "72234dd4850cad0ece4bb024185dddf362256522305462d9316db6b700d5933a",
     "couplers.html": "73681dba842eb1bf7b67551f55fabe647dec1607759b4a05f02a87896f0a12f8",
     "device-settings.html": "7f502cce1715f3ea6682fc4f1775467a4d0272fa63d6ed6fdafe3ed6954edc57",
     "digital-io.html": "04234f7cd1aaac39905dd0d955e9b57b5f51890a57d47f4640a2a522a97e3eb7",
@@ -118,7 +118,7 @@
     "remote-host.html": "1245ab46d50297ed46157020a1d6c0d8ac090c0a7469e70dbb2961869372c82e",
     "rf-history.html": "df83dea23fa91d6d449418f99a8c426f5c9c2cc2aa6ed7d84c235e7d8731c17f",
     "rf-measurements.html": "1a945f40e625477dc1d83b96e6fa70a7c6db23ed3b3f20187640c83e1a49fa25",
-    "rig-sweep.html": "e86e3ba8e3e2d0140eabf1272a94a44858a2ecfd32edf140e2d886521518b93f",
+    "rig-sweep.html": "51c31c9bebce80fa99deee7eede23a2675bf131ba80cff6e79a96b1267f84300",
     "rotators.html": "22d18c3c639511556bcb50b121b53fceb2e8b50331652f174128a5dac87a23e6",
     "scope-units.html": "608ee16c946e538be0602d625689311d0aadb1a91990c1fc5b444e5a6b1074fb",
     "scope.html": "92c126c2f7bf6a469068ae4ac0ddbe26d177f8a2058ca97012689ccd8d73c75a",
@@ -130,7 +130,7 @@
     "temperature.html": "69b8643e72afbdee55a3df00ee3faa4e138aa8fdc4e459b66292d2504812fa7f",
     "thetis.html": "f97d7aeb2b742cee7cafb4a070cc82ababada5d61330ff20b7b0d3f11a586ca5",
     "tones.html": "0749ae41273f7b19a09e9273e3e7a6e412f7c4c4eef8a76dc708d4cc981f1e9b",
-    "unattended-station.html": "a456670269d9443af2941a0dbe8be69cfdde773d4850fa21209193200c51bf76"
+    "unattended-station.html": "ab15071e415c7f2111739de03de42e5e067f61080ce830598a6d5e48431ae597"
   },
   "files": {
     ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -145,7 +145,7 @@
     "audio-messages.html": "89942d0c92088eba0438d59c061dac18d8f6eff57f12d3f9b1b545b574d06497",
     "auxiliary.html": "c2625786ce950c282711aedf1485c7d8a702ec4d4a9682a3806130bad48e3787",
     "comparison-curves.html": "3591d01885e70f2a41d3cf4362e4dabd30bdade42cfaa20db953f2a84145f1fd",
-    "connections.html": "a2201891044585f3f55d6834b823a2bd59323b22acb101cc49232780dadf10ba",
+    "connections.html": "1fa08d3399f1928846f438f519cd5ecdea7fccadac0203c73666c0e66386959c",
     "couplers.html": "26acc0eb27f33a346941f09bc03397986ad000d00eaddd2c58bcdf886b283bfb",
     "device-settings.html": "034516c2bc446e801a324a2f15dc358dcfe810ecf7b4677b26176b7354a45691",
     "digital-io.html": "004cd5b93bd84b9e9257049e0a9d94b5cb610f2d930fc7a9b38645575223eb52",
@@ -256,11 +256,11 @@
     "remote-host.html": "03393195e09d64ca6a2eecd5368fd9766d92716ba66cbeee3357635403e48e65",
     "rf-history.html": "d32288cc7de13b9c3021c394abf9f268dd18bff753517a727584c959f5be1600",
     "rf-measurements.html": "637af2b18550131ea7d27a3105e5020636c2cdf2982fcf9574320e47a22b8e6b",
-    "rig-sweep.html": "53de0adfd34e87a91c4841b2ea6b9cc960278cd8393052fbd83e6df16e721e8d",
+    "rig-sweep.html": "8bb825ae390a64b685f0ab7566444c8647fcdab21880dad3e8b478da634c4278",
     "rotators.html": "0cd181ed17a368b8bf1edade840786c598332fef156e4d5d014ad9642a4b92a8",
     "scope-units.html": "a65454e3dcdc43f76112048174ea36407222736ecaa0cfc65279f65bdb89fff5",
     "scope.html": "3b9d2b864d6e5857a6fb6b8d2b99a146e6bf71c9150fee5ce3a8b13ab58ecb02",
-    "search-data.js": "a0ad9f872fb4304d98e762c52a3ad88fdeef956ff4efb532bd8d5dde8c023874",
+    "search-data.js": "689f07171f1cecb943b9d864a81a03873be53407a9cfbf672de9658b0ecb7d35",
     "site.css": "5f1ecc50f9699e7eeaf768187f93af9737558a02355b07baac4a8962298be080",
     "site.js": "fa3a5d2fad47b434652bee4cf85a8f5bab235628d0d4974199275ff2e2489d50",
     "smart-reset.html": "ab00facf3a599d073a26a19cd15b788b131b5d6d0ae3160e127aa78881dca920",
@@ -271,6 +271,6 @@
     "temperature.html": "e3675103255b18dae3770c0b733d3911c90385c496c61fbd875f4827d887074d",
     "thetis.html": "067a8bb5999c4ceee977786b91bb6d7a93b00b94332c4872860423a154596868",
     "tones.html": "1506ea3e455ca4a830a8f3a8e5e2980cfb5590c95063f347fb1cef7c23a35b02",
-    "unattended-station.html": "418e1d61e2d25bb448c86cba27a35e99af89f8603f58c5172ff699c33427bc25"
+    "unattended-station.html": "3a41cc0364c80f2e74fad513160a33be4d908c4948070f8efb4a161a09d0438f"
   }
 }

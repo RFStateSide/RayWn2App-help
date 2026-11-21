@@ -552,6 +552,25 @@
               "null"
             ],
             "description": "Return loss in dB; null if invalid/nonfinite. Can be negative."
+          },
+          "average_power": {
+            "type": "object",
+            "description": "Optional provenance: policy (legacy or explicitly selected raw-usb-host-estimate), effective forward/reflected processing, and swr_basis (legacy-average). Watt readings are already processed; clients must not apply the estimate again. An active reference curve bypasses estimation for its direction. Other processing states identify the low-level gate or unavailable inputs. Firmware is not automatically inferred; modulated-signal accuracy remains unqualified.",
+            "properties": {
+              "policy": {
+                "type": "string"
+              },
+              "forward": {
+                "type": "string"
+              },
+              "reflected": {
+                "type": "string"
+              },
+              "swr_basis": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
           }
         },
         "additionalProperties": true

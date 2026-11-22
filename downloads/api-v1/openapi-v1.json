@@ -555,7 +555,7 @@
           },
           "average_power": {
             "type": "object",
-            "description": "Optional provenance: policy (legacy or explicitly selected raw-usb-host-estimate), effective forward/reflected processing, and swr_basis (legacy-average). Watt readings are already processed; clients must not apply the estimate again. An active reference curve bypasses estimation for its direction. Other processing states identify the low-level gate or unavailable inputs. Firmware is not automatically inferred; modulated-signal accuracy remains unqualified.",
+            "description": "Optional provenance: policy (legacy or explicitly selected raw-usb-host-estimate), effective forward/reflected processing, and swr_basis (legacy-average or explicitly selected paired-peak). Watt readings are already processed; clients must not apply the estimate again. An active reference curve bypasses estimation for its direction. Other processing states identify the low-level gate or unavailable inputs. Firmware is not automatically inferred; modulated-signal accuracy remains unqualified.",
             "properties": {
               "policy": {
                 "type": "string"
@@ -571,6 +571,49 @@
               }
             },
             "additionalProperties": true
+          },
+          "swr_calculation": {
+            "type": "object",
+            "description": "Optional SWR/return-loss provenance. Legacy average-power ratio is the default. Paired-peak uses calibrated forward/reflected peaks from the same USB acquisition frame, selecting the median-ratio pair from up to three valid frames within 1000 ms. This independent RF StateSide filter does not reproduce the vendor host algorithm. Invalid, low-RF or clipped input clears history. Peak measurements and software-held peaks are not modified. Same-frame grouping does not prove simultaneous hardware acquisition. No firmware capability is inferred. The chosen pair can predate the current frame; inspect age_ms and frame. Unknown optional fields must be tolerated.",
+            "properties": {
+              "policy": {
+                "type": "string",
+                "enum": [
+                  "legacy-average",
+                  "paired-peak"
+                ]
+              },
+              "processing": {
+                "type": "string"
+              },
+              "samples": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 3
+              },
+              "age_ms": {
+                "type": "number",
+                "description": "Age of selected pair at snapshot generation; -1 without a selected peak pair."
+              },
+              "frame": {
+                "type": "number",
+                "description": "Session telemetry frame count for the selected pair; 0 without a peak pair."
+              },
+              "forward_W": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Calibrated ratio-basis forward watts, null if stale or unavailable."
+              },
+              "reflected_W": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Calibrated ratio-basis reflected watts, null if stale or unavailable."
+              }
+            }
           }
         },
         "additionalProperties": true

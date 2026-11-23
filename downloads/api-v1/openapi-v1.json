@@ -614,6 +614,21 @@
                 "description": "Calibrated ratio-basis reflected watts, null if stale or unavailable."
               }
             }
+          },
+          "power_conversion": {
+            "type": "object",
+            "description": "Optional per-device/channel/coupler calculation provenance. Legacy uses the saved scalar/reference profile unchanged. Explicit wavenode-host-v1 is a separate factory detector conversion for LP-1, standard HF and channel-specific HF-8KW families; saved scalar coefficients are bypassed but not modified, ADC zeros are retained. Active reference matching preserves the whole channel legacy conversion. Unsupported models remain on the stored profile. Per-frame only: no original-host display-history filtering or firmware inference. Physical RF accuracy is unqualified. Consumers must not apply this processing again. Eligible new supported coupler configurations select host factory conversion, corrected detector average and paired-peak SWR; existing saved policies retain their behavior. These preferences do not establish physical RF accuracy. All nine current couplers are mapped; L/M-1, CS-1, UHF-220MHz and UHF-70cm share the HF family by owner-approved rated-range mapping, identified in processing metadata and not independently physically qualified. Historical 8KW/HF-UHF keys are retained; 20KW factory parity is deferred.",
+            "properties": {
+              "policy": {
+                "type": "string"
+              },
+              "processing": {
+                "type": "string"
+              },
+              "scope": {
+                "type": "string"
+              }
+            }
           }
         },
         "additionalProperties": true

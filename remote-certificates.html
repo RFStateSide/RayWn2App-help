@@ -3,13 +3,26 @@
 <p>Prepare the certificate on the host before you invite clients. A certificate lets the client verify the station's identity and encrypt its connection. The accompanying private key stays on the host. Each client operator verifies the certificate's SHA-256 fingerprint with you.</p>
 <h2 id="create">Create the files once</h2>
 <p>Use an installed OpenSSL command-line tool on the host, or obtain a PEM certificate and matching unencrypted private key from your certificate administrator. Create a dedicated private folder in your user profile, outside shared folders and source repositories, and open a terminal in it.</p>
-<p>On Windows, use PowerShell. If OpenSSL is not found, specify its installed path. With a path containing spaces, prefix the quoted executable path with the PowerShell call operator <b>&amp;</b>. On Linux and macOS, open Terminal. Run the following as one command.</p>
-<p><code>openssl req -x509 -newkey rsa:3072 -nodes -days 365 -subj "/CN=RayWn2App-Station" -keyout station-key.pem -out station-cert.pem</code></p>
+<h3 id="windows-powershell">Windows — PowerShell and the full OpenSSL path</h3>
+<p>Open <b>PowerShell</b> on the Station Host computer. The following example uses OpenSSL installed at <b>C:\Program Files\OpenSSL-Win64\bin\openssl.exe</b>. If you installed it elsewhere, substitute its actual location. You can use the full path even when typing <code>openssl</code> by itself reports that the command was not found.</p>
+<p>First create the private station folder if needed, then make it the current folder:</p>
+<pre><code>New-Item -ItemType Directory -Force -Path "$env:LOCALAPPDATA\RFStateside\RayWn2App\remote-station" | Out-Null
+Set-Location "$env:LOCALAPPDATA\RFStateside\RayWn2App\remote-station"</code></pre>
+<p><code>$env:LOCALAPPDATA</code> automatically selects your Windows account's local application-data folder. For example, on Ray's computer the location is <b>C:\Users\ray\AppData\Local\RFStateside\RayWn2App\remote-station</b>. The folder you select determines where the two new files are saved; it does not need to contain OpenSSL itself.</p>
+<p>If these files already belong to a working host, keep them and follow <a href="#renew">Renew or use another certificate</a> instead of overwriting them. Regenerating the certificate changes the host identity and requires clients to pair again.</p>
+<p>For the first certificate, run this next line as <b>one command</b>. Keep the leading <b>&amp;</b> and the quotes around the executable path:</p>
+<pre><code>&amp; 'C:\Program Files\OpenSSL-Win64\bin\openssl.exe' req -x509 -newkey rsa:3072 -nodes -days 365 -subj "/CN=RayWn2App-Station" -keyout station-key.pem -out station-cert.pem</code></pre>
+<p>The <b>&amp;</b> tells PowerShell to run the program at the quoted path. Quotes keep the spaces in <b>Program Files</b> together. This full-path form does not require changing your Windows PATH setting. After it finishes, the station folder contains <b>station-key.pem</b> and <b>station-cert.pem</b>.</p>
+<h3 id="linux-macos">Linux and macOS — Terminal</h3>
+<p>Open Terminal in your dedicated private station folder. With OpenSSL available, run this as one command:</p>
+<pre><code>openssl req -x509 -newkey rsa:3072 -nodes -days 365 -subj "/CN=RayWn2App-Station" -keyout station-key.pem -out station-cert.pem</code></pre>
 <p>This creates a new 3072-bit RSA key and a self-signed certificate valid for 365 days. Keep <b>station-key.pem</b> private. The key is unencrypted so the station can start unattended. Restrict the folder and key to the host account and administrators. In a dedicated Linux or macOS TLS folder, run <code>chmod 700 .</code> and <code>chmod 600 station-key.pem</code>. On Windows, check the folder's Properties → Security permissions.</p>
 <h2 id="select">Select and remember</h2>
-<p>Open <b>Tools → Remote Station → Station Host</b>, choose <b>station-cert.pem</b> as the TLS certificate and <b>station-key.pem</b> as the TLS private key, then <b>Start host</b>. After a successful start, RayWn2App remembers those paths, the listen address and port. Keep the files at those locations. The dialog shows expiry in UTC and warns within 30 days of expiration.</p>
-<p>To display the fingerprint and validity dates from a terminal, use this command.</p>
-<p><code>openssl x509 -in station-cert.pem -noout -fingerprint -sha256 -dates</code></p>
+<p>Open <b>Tools → Remote Station → Station Host</b>, use each <b>Browse…</b> button to open the station folder and choose <b>station-cert.pem</b> as the TLS certificate and <b>station-key.pem</b> as the TLS private key, then <b>Start host</b>. After a successful start, RayWn2App remembers those paths, the listen address and port. Keep the files at those locations. The dialog shows expiry in UTC and warns within 30 days of expiration.</p>
+<p>To display the fingerprint and validity dates, stay in the station folder. On Windows PowerShell, use the same full executable path:</p>
+<pre><code>&amp; 'C:\Program Files\OpenSSL-Win64\bin\openssl.exe' x509 -in station-cert.pem -noout -fingerprint -sha256 -dates</code></pre>
+<p>On Linux or macOS Terminal:</p>
+<pre><code>openssl x509 -in station-cert.pem -noout -fingerprint -sha256 -dates</code></pre>
 <h2 id="renew">Renew or use another certificate</h2>
 <p>Generate replacement files before the old certificate expires. Use different filenames, such as <b>station-key-new.pem</b> and <b>station-cert-new.pem</b>, so the existing identity remains available while you prepare the replacement. With the desktop host stopped, select the replacement files and start it to save the new paths.</p>
 <p>A new certificate has a new fingerprint. Verify it with each client operator, pair clients again and update instrument bindings to the new remote host identity. Stopping a desktop host revokes its running pairings. The Pi service reads certificate paths from its station JSON. Update those paths and restart that service when replacing its identity.</p>

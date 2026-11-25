@@ -9,6 +9,7 @@
 <li>Look for Live and an increasing telemetry-frame count in the emulator window. Opening its window or checking Power ON is not a separate Connect action. Connect each emulator separately, just as you connect physical devices separately.</li>
 </ol>
 <p><a href="images/emulator-1.png"><img src="images/emulator-1.png" width="680" alt="Simulated RF controls for each coupler."></a><br><i>Simulated RF controls for each coupler. Select image to enlarge.</i></p>
+<p>With tooltips enabled in <b>Device → Settings → Application</b>, pause the pointer over a control for an explanation. Tooltips cover raw input counts, reflected power, Scope waveforms, input loopback, simulated trips and failure testing.</p>
 <h2 id="change-the-simulated-readings">Change the simulated readings</h2>
 <p>On RF couplers, enable the desired channels and change Forward ADC, reflected percentage and peak multiplier. ADC counts are the emulator's raw input level; the application converts them through the selected coupler settings. Reflected percentage is a power percentage. On DC / analog / digital, change input values to exercise those instruments. Digital loopback can make simulated outputs appear at the simulated inputs. None of these controls operates a physical WN-2.</p>
 <p><a href="images/emulator-2.png"><img src="images/emulator-2.png" width="680" alt="Practice voltage, temperature and digital input displays here."></a><br><i>Practice voltage, temperature and digital input displays here. Select image to enlarge.</i></p>
@@ -18,7 +19,7 @@
 <p>Configure and Apply protection to the virtual device before expecting a threshold trip. The protection tab also provides trip/reset test controls. To test Smart Reset, remove simulated RF on every channel that is preventing the five-second countdown.</p>
 <p><a href="images/emulator-4.png"><img src="images/emulator-4.png" width="680" alt="Protection test controls avoid needing repeated physical high-SWR conditions."></a><br><i>Protection test controls avoid needing repeated physical high-SWR conditions. Select image to enlarge.</i></p>
 <h2 id="more-than-one-emulator">More than one emulator</h2>
-<p>Choose <b>New emulator</b> to create another identity, such as VIRTUAL-WN2-EMULATOR-2. Select it in the toolbar and Connect. Reassign copied instruments to it. Each instance has independent stimuli and settings.</p>
+<p>Choose <b>Create 2nd instance of WN-2 emulator…</b> to create another identity, such as VIRTUAL-WN2-EMULATOR-2. Select it in the toolbar and Connect. Reassign copied instruments to it. Each instance has independent stimuli and settings. When two or more emulator windows exist, the button reads <b>Create another instance of WN-2 emulator…</b>. It is for practicing multi-device station layouts and monitoring without additional hardware. Each virtual meter needs its own Connect and instrument bindings.</p>
 <h2 id="power-pause-and-close">Power, pause and close</h2>
 <p>Power OFF simulates loss; ON makes the device available again. Automatic recovery must be enabled if you want it to reconnect after loss. Pause data simulates stale readings. Closing an emulator window disconnects that instance; minimize it to keep it running while working elsewhere.</p>
 <hr><p><a href="index.html">Help home</a> · RF StateSide · RayWn2App operator guide</p>
